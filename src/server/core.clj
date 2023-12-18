@@ -1,28 +1,31 @@
 (ns server.core
   (:require [ring.adapter.jetty :refer [run-jetty]]
-            [hiccup2.core :as h]
+            [hiccup2.core :refer [html]]
             [ring.util.response :refer [redirect]]
-            [reitit.ring :as ring])
-  (:gen-class))
+            [reitit.ring :refer [router ring-handler]]
+            [db.contact :refer [get-contacts]]
+            [templates.contact :refer [contacts-table]]))
 
-(defn hello-body
-  []
-  (str (h/html [:h1 "Hello World!"])))
-
-(defn hello-handler [request]
-  {:status  200
-   :headers {"Content-Type" "text/html; charset=UTF-8"}
-   :body    (hello-body)})
-
-(defn root-handler [request]
+(defn root [request]
   (redirect "/contacts"))
 
-(def router
-  (ring/router
-     [["/"         {:get root-handler}]
-      ["/contacts" {:get hello-handler}]]))
+(defn contacts [request]
+  {:status  200
+   :headers {"Content-Type" "text/html; charset=UTF-8"}
+   :body    (contacts-table get-contacts)})
 
-(def app (ring/ring-handler router))
+(defn new-contact [request]
+  {:status  200
+   :headers {"Content-Type" "text/html; charset=UTF-8"}
+   :body    (str (html [:h1 "Hello World!"]))})
+
+(def my-router
+  (router
+     [["/"             {:get root}]
+      ["/contacts"     {:get contacts}]
+      ["/contacts/new" {:get new-contact}]]))
+
+(def app (ring-handler my-router))
 
 (defn -main [& args]
   (run-jetty app {:port 3000}))
