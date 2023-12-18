@@ -1,0 +1,6 @@
+#+title: Read Me
+
+* Running the server
+#+begin_src shell
+clj -M -m server.core
+#+end_src
