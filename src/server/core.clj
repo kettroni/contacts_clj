@@ -37,7 +37,7 @@
     [["/"             {:get root}]
      ["/contacts"     {:get contacts}]
      ["/contacts/new" {:get new-contact
-                      :post (wrap-params create-new-contact)}]]))
+                       :post (wrap-params create-new-contact)}]]))
 
 (def app (ring-handler my-router))
 
