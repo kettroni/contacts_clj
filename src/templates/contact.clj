@@ -47,4 +47,5 @@
 
 (defn new-contact-view
   []
-  (str (html (new-contact-form))))
+  (str (html (new-contact-form)
+             [:a {:href "/contacts"} "Back"])))
