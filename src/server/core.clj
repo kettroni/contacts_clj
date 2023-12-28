@@ -9,7 +9,7 @@
    [ring.util.response     :refer [redirect]]
    [templates.contact      :refer [contact-detail-view contact-edit-view
                                    contacts-view new-contact-view]]
-   [utils :refer [parse-number]]))
+   [utils                  :refer [parse-number]]))
 
 (defn root [_] (redirect "/contacts"))
 
