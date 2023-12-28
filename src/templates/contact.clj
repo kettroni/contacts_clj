@@ -49,3 +49,15 @@
   []
   (str (html (new-contact-form)
              [:a {:href "/contacts"} "Back"])))
+
+(defn contact-detail-view
+  [c]
+  (str (html [:h1 (str (:fname c) " " (:lname c))]
+             [:div [:div (:pnumber c)]
+                   [:div (:email c)]]
+             [:p [:a {:href (str "/contacts/" (:id c) "/edit")} "Edit"]
+                 [:a {:href "/contacts"} "Back"]])))
+
+(comment
+  (contact-detail-view {:fname "X1" :lname "Y1nen" :pnumber "0441234567" :email "x1@y1nen.com" :id 1})
+  )
