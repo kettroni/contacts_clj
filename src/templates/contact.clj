@@ -6,9 +6,9 @@
 
 (defn- contact-tr
   [c]
-  [:tr [:td (:fname c)]
-       [:td (:lname c)]
-       [:td (:pnumber c)]
+  [:tr [:td (:firstname c)]
+       [:td (:lastname c)]
+       [:td (:phonenumber c)]
        [:td (:email c)]
        [:td [:a {:href (str "/contacts/" (:id c) "/edit")} "Edit"]
             [:a {:href (str "/contacts/" (:id c))}  "View"]]])
@@ -63,8 +63,8 @@
 
 (defn contact-detail-view
   [c]
-  (str (html [:h1 (str (:fname c) " " (:lname c))]
-             [:div [:div (:pnumber c)]
+  (str (html [:h1 (str (:firstname c) " " (:lastname c))]
+             [:div [:div (:phonenumber c)]
                    [:div (:email c)]]
              [:p [:a {:href (str "/contacts/" (:id c) "/edit")} "Edit"]
                  (back-anchor)])))
@@ -76,4 +76,4 @@
              (back-anchor))))
 
 (comment
-  (contact-detail-view {:fname "X1" :lname "Y1nen" :pnumber "0441234567" :email "x1@y1nen.com" :id 1}))
+  (contact-detail-view {:firstname "X1" :lastname "Y1nen" :phonenumber "0441234567" :email "x1@y1nen.com" :id 1}))

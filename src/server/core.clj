@@ -16,7 +16,7 @@
 (defn contacts [_]
   {:status  200
    :headers {"Content-Type" "text/html; charset=UTF-8"}
-   :body    (contacts-view get-contacts)})
+   :body    (contacts-view (get-contacts))})
 
 (defn new-contact [_]
   {:status  200

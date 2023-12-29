@@ -7,7 +7,8 @@
   hiccup/hiccup {:mvn/version "2.0.0-RC2"}
   metosin/reitit-ring {:mvn/version "0.7.0-alpha7"}
   com.github.seancorfield/honeysql {:mvn/version "2.5.1103"}
-  org.clojure/java.jdbc {:mvn/version "0.7.12"}}
+  org.clojure/java.jdbc {:mvn/version "0.7.12"}
+  org.xerial/sqlite-jdbc {:mvn/version "3.44.1.0"}}
 
  :aliases
  {:dev
