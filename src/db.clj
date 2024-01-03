@@ -12,13 +12,13 @@
    :dbname (str "db/" dbname)})
 
 (def ^:private create-table-string (-> (h/create-table :contact :if-not-exists)
-                             (h/with-columns [[:id :integer :primary-key :autoincrement]
-                                              [:first-name [:varchar 32] :not-null]
-                                              [:last-name [:varchar 32] :not-null]
-                                              [:email [:varchar 32] :not-null :unique]
-                                              [:phone-number [:varchar 32] :not-null :unique]])
-                             sql/format
-                             first))
+                                       (h/with-columns [[:id :integer :primary-key :autoincrement]
+                                                        [:first-name [:varchar 32] :not-null]
+                                                        [:last-name [:varchar 32] :not-null]
+                                                        [:email [:varchar 32] :not-null :unique]
+                                                        [:phone-number [:varchar 32] :not-null :unique]])
+                                       sql/format
+                                       first))
 
 (defn create-contact
   [c]
