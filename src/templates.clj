@@ -2,7 +2,8 @@
   (:require
    [hiccup.form :refer [form-to]]
    [hiccup2.core :refer [html]]
-   [utils :refer [kebab-to-title]]))
+   [utils :refer [kebab-to-title
+                  to-snake]]))
 
 (defn- contact-tr
   [c]
@@ -31,29 +32,32 @@
              (new-contact-button))))
 
 (defn- form-field
-  [fieldname]
-  (let [title-field (kebab-to-title fieldname)]
-   [:p [:label {:for fieldname} title-field]
-       [:input {:name fieldname :id fieldname :type fieldname :placeholder title-field}]
-       [:span]]))
+  ([field-name & [place-holder]]
+   (let [titled (kebab-to-title (name field-name))
+         place-holder' (or place-holder (str "insert '" titled "' here."))]
+     [:p [:label {:for field-name} titled]
+         [:input {:name field-name :id field-name :type field-name :placeholder place-holder'}]
+         [:span]])))
 
-(defn- contact-form [post-path]
+(defn- contact-form-fields
+  [contact]
+   (map #(form-field % ((keyword %) contact)) [:first-name :last-name :email :phone-number]))
+
+(defn- contact-form
+  [post-path & [contact]]
   (form-to [:post post-path]
            [:fieldset [:legend "Contact Values"]
-                     (form-field "email")
-                     (form-field "first-name")
-                     (form-field "last-name")
-                     (form-field "phone-number")]
-           [:button "Save"]))
+                      (contact-form-fields contact)
+                      [:button "Save"]]))
 
-(defn- new-contact-form []
-  (contact-form "/contacts/new"))
+(contact-form-fields nil)
+(contact-form-fields {:first-name "ron" :last-name "fox" :email "ron.fox@gmail.com" :phone-number "9876543210"})
 
 (defn- back-anchor []
   [:a {:href "/contacts"} "Back"])
 
 (defn new-contact-view []
-  (str (html (new-contact-form)
+  (str (html (contact-form "/contacts/new")
              (back-anchor))))
 
 (defn- delete-contact-form
@@ -70,10 +74,11 @@
                  (back-anchor)])))
 
 (defn contact-edit-view
-  [id]
-  (str (html (contact-form (str "/contacts/" id "/edit"))
-             (delete-contact-form id)
-             (back-anchor))))
+  [contact]
+  (let [id (:id contact)]
+    (str (html (contact-form (str "/contacts/" id "/edit") contact)
+               (delete-contact-form id)
+               (back-anchor)))))
 
 (comment
   (contact-detail-view {:first-name "X1" :last-name "Y1nen" :phone-number "0441234567" :email "x1@y1nen.com" :id 1}))

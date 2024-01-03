@@ -1,22 +1,22 @@
 (ns server
   (:require
-   [data                   :refer [valid-contact]]
+   [validation             :refer [valid-contact]]
    [db                     :refer [create-contact
                                    delete-contact
                                    get-contact
                                    get-contacts]]
    [utils                  :refer [parse-number]]
+   [templates              :refer [contact-detail-view
+                                   contact-edit-view
+                                   contacts-view
+                                   new-contact-view]]
    [reitit.ring            :refer [ring-handler
                                    router]]
    [ring.adapter.jetty     :refer [run-jetty]]
    [ring.middleware.flash  :refer [flash-response
                                    wrap-flash]]
    [ring.middleware.params :refer [wrap-params]]
-   [ring.util.response     :refer [redirect]]
-   [templates              :refer [contact-detail-view
-                                   contact-edit-view
-                                   contacts-view
-                                   new-contact-view]]))
+   [ring.util.response     :refer [redirect]]))
 
 (defn root [_] (redirect "/contacts"))
 
@@ -30,14 +30,18 @@
    :headers {"Content-Type" "text/html; charset=UTF-8"}
    :body    (new-contact-view)})
 
+(defn- response-with-flash-message [base-response msg]
+  (assoc base-response :flash msg))
+
 (defn create-new-contact [request]
   (let [fps (:form-params request)
         c (valid-contact fps)]
+    ;; TODO: fix this to check for invalid type.
     (if c
-      ;; TODO: implement saving.
-      (let [resp (assoc (redirect "/contacts" 303) :flash "Created new contact!")]
+      (let [base-response (redirect "/contacts" 303)
+            response (response-with-flash-message base-response "Created a new contact!")]
         (create-contact c)
-        (flash-response resp request))
+        (flash-response response request))
       {:status 400
        :headers {"Content-Type" "text/plaintext; charset=UTF-8"}
        :body (str "Invalid contact information: " fps)})))
@@ -60,8 +64,9 @@
       ;; TODO: implement saving and validation.
       ;; form-params available, handle post request.
       (if c
-        (let [resp (assoc (redirect "/contacts" 303) :flash "Edited contact succesfully!")]
-            (flash-response resp request))
+        (let [base-response (redirect "/contacts" 303)
+              response (response-with-flash-message base-response "Edited contact succesfully!")]
+          (flash-response response request))
         {:status 400
          :headers {"Content-Type" "text/plaintext; charset=UTF-8"}
          :body (str "Invalid contact information: " fps)})
@@ -71,7 +76,7 @@
             contact (get-contact c-id)]
         {:status 200
          :headers {"Content-Type" "text/html; charset=UTF-8"}
-         :body    (contact-edit-view (:id contact))}))))
+         :body    (contact-edit-view contact)}))))
 
 (defn- contact-delete [request]
   (let [c-id (id-from-request-path request)

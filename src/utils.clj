@@ -11,23 +11,26 @@
        (map str/capitalize)
        str/join))
 
-(defn- keys-to-case
-  [keys-to-case-fun m]
-  (cske/transform-keys keys-to-case-fun m))
-
 (defn keys-to-kebab
-  [m]
-  (keys-to-case csk/->kebab-case-keyword m))
+  "Returns a map with kebab-case keys."
+  [map]
+  (cske/transform-keys csk/->kebab-case-keyword map))
 
 (defn keys-to-snake
-  [m]
-  (keys-to-case csk/->snake_case_keyword m))
+  "Returns a map with snake_case keys."
+  [map]
+  (cske/transform-keys csk/->snake_case_keyword map))
 
 (defn kebab-to-title
   "'kebab-case' -> 'Kebab Case'"
   [s]
   (-> (str/replace s #"-" " ")
       capitalize-words))
+
+(defn to-snake
+  "Returns string as snake_case"
+  [s]
+  (csk/->snake_case s))
 
 (defn parse-number
   "Reads a number from a string. Returns nil if not a number."
