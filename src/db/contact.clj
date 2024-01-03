@@ -1,7 +1,9 @@
 (ns db.contact
   (:require [clojure.java.jdbc :as j]
             [honey.sql :as sql]
-            [honey.sql.helpers :as h]))
+            [honey.sql.helpers :as h]
+            [camel-snake-kebab.core :as csk]
+            [camel-snake-kebab.extras :as cske]))
 
 (def dbname "contact.db")
 
@@ -11,40 +13,46 @@
 
 (def create-table-string (-> (h/create-table :contact :if-not-exists)
                              (h/with-columns [[:id :integer :primary-key :autoincrement]
-                                              [:firstname [:varchar 32] :not-null]
-                                              [:lastname [:varchar 32] :not-null]
+                                              [:first-name [:varchar 32] :not-null]
+                                              [:last-name [:varchar 32] :not-null]
                                               [:email [:varchar 32] :not-null :unique]
-                                              [:phonenumber [:varchar 32] :not-null :unique]])
+                                              [:phone-number [:varchar 32] :not-null :unique]])
                              sql/format
                              first
                              str))
 
-(defn- create-contact
-  [fname lname email phonenumber]
-  (j/execute! db-spec (-> (h/insert-into :contact)
-                          (h/columns :firstname :lastname :email :phonenumber)
-                          (h/values [[fname lname email phonenumber]])
-                          (sql/format {:pretty true}))))
+(defn create-contact
+  [c]
+  (let [q (-> (h/insert-into :contact)
+              (h/values [c])
+              (sql/format {:pretty true}))]
+    (println c)
+    (println q)
+    (j/execute! db-spec q)))
 
-(defn create-table [] (j/execute! db-spec create-table-string))
-(defn drop-table [] (j/execute! db-spec "DROP TABLE IF EXISTS contact"))
-(defn create-example-contact [] (create-contact "roni" "kettunen" "rk@gmail.com" "0123456789"))
+(defn- create-table [] (j/execute! db-spec create-table-string))
+(defn- drop-table [] (j/execute! db-spec "DROP TABLE IF EXISTS contact"))
+(defn- create-example-contact [] (create-contact {:first-name "roni" :last-name "kettunen" :email "rk@gmail.com" :phone-number "0123456789"}))
+(defn- create-example-contact2 [] (create-contact {:first-name "ron" :last-name "fox" :email "ron.fox@gmail.com" :phone-number "9876543210"}))
+
+(defn- keys-to-kebab
+  [m]
+  (cske/transform-keys csk/->kebab-case-keyword m))
 
 (defn get-contacts
   []
-  (into [] (j/query db-spec (-> (h/select :*)
-                                (h/from :contact)
-                                sql/format
-                                first
-                                str))))
+  (let [q (str "select * from contact")]
+    (->> (j/query db-spec q)
+         (into [])
+         keys-to-kebab)))
 
 (defn get-contact
   [id]
-  (first (into [] (j/query db-spec (-> (h/select :*)
-                                (h/from :contact)
-                                sql/format
-                                first
-                                (str " WHERE id = " id))))))
+  (let [q (str "select * from contact where id = " id)]
+    (->> (j/query db-spec q)
+         (into [])
+         first
+         keys-to-kebab)))
 
 (comment
   ;; Table commands
@@ -53,6 +61,7 @@
 
   ;; Test creation and SELECT
   (create-example-contact)
+  (create-example-contact2)
   (get-contacts)
   (get-contact 1)
 )

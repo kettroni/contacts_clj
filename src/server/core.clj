@@ -1,7 +1,7 @@
 (ns server.core
   (:require
-   [data.contact           :refer [valid-contact?]]
-   [db.contact             :refer [get-contact get-contacts]]
+   [data.contact           :refer [valid-contact]]
+   [db.contact             :refer [create-contact get-contact get-contacts]]
    [reitit.ring            :refer [ring-handler router]]
    [ring.adapter.jetty     :refer [run-jetty]]
    [ring.middleware.flash  :refer [flash-response wrap-flash]]
@@ -24,11 +24,12 @@
    :body    (new-contact-view)})
 
 (defn create-new-contact [request]
-  (let [fps (:form-params request)]
-    (if (valid-contact? fps)
-      ;; TODO: implement saving and validation.
-      ;; (create-contact c)
+  (let [fps (:form-params request)
+        c (valid-contact fps)]
+    (if c
+      ;; TODO: implement saving.
       (let [resp (assoc (redirect "/contacts" 303) :flash "Created new contact!")]
+        (create-contact c)
         (flash-response resp request))
       {:status 400
        :headers {"Content-Type" "text/plaintext; charset=UTF-8"}
@@ -46,13 +47,14 @@
      :body    (contact-detail-view contact)}))
 
 (defn- contact-edit [request]
-  (let [fps (:form-params request)]
+  (let [fps (:form-params request)
+        c (valid-contact fps)]
     (if fps
+      ;; TODO: implement saving and validation.
       ;; form-params available, handle post request.
-      (if (valid-contact? fps)
+      (if c
         (let [resp (assoc (redirect "/contacts" 303) :flash "Edited contact succesfully!")]
             (flash-response resp request))
-        ;; TODO: implement saving and validation.
         {:status 400
          :headers {"Content-Type" "text/plaintext; charset=UTF-8"}
          :body (str "Invalid contact information: " fps)})
