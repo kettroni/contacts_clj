@@ -1,15 +1,22 @@
-(ns server.core
+(ns server
   (:require
-   [data.contact           :refer [valid-contact]]
-   [db.contact             :refer [create-contact get-contact get-contacts]]
-   [reitit.ring            :refer [ring-handler router]]
+   [data                   :refer [valid-contact]]
+   [db                     :refer [create-contact
+                                   delete-contact
+                                   get-contact
+                                   get-contacts]]
+   [utils                  :refer [parse-number]]
+   [reitit.ring            :refer [ring-handler
+                                   router]]
    [ring.adapter.jetty     :refer [run-jetty]]
-   [ring.middleware.flash  :refer [flash-response wrap-flash]]
+   [ring.middleware.flash  :refer [flash-response
+                                   wrap-flash]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.util.response     :refer [redirect]]
-   [templates.contact      :refer [contact-detail-view contact-edit-view
-                                   contacts-view new-contact-view]]
-   [utils                  :refer [parse-number]]))
+   [templates              :refer [contact-detail-view
+                                   contact-edit-view
+                                   contacts-view
+                                   new-contact-view]]))
 
 (defn root [_] (redirect "/contacts"))
 
@@ -69,6 +76,7 @@
 (defn- contact-delete [request]
   (let [c-id (id-from-request-path request)
         resp (assoc (redirect "/contacts" 303) :flash "Deleted contact!")]
+    (delete-contact c-id)
     (flash-response resp request)))
 
 (def my-router

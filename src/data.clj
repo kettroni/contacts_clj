@@ -1,4 +1,4 @@
-(ns data.contact
+(ns data
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str]))

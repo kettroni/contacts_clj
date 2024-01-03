@@ -1,4 +1,4 @@
-(ns templates.contact
+(ns templates
   (:require
    [hiccup.form :refer [form-to]]
    [hiccup2.core :refer [html]]

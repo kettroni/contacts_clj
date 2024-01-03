@@ -2,5 +2,5 @@
 
 * Running the server
 #+begin_src shell
-clj -M -m server.core
+clj -M -m server
 #+end_src
