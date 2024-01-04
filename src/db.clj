@@ -25,8 +25,6 @@
   (let [sanitized-contact (-> contact
                               (select-keys [:first-name :last-name :email :phone-number])
                               keys-to-snake)]
-    (println contact)
-    (println sanitized-contact)
     (j/execute! db-spec (-> (h/insert-into :contact)
                             (h/values [sanitized-contact])
                             (sql/format {:pretty true})))))
