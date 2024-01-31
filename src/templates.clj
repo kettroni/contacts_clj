@@ -32,16 +32,17 @@
              (new-contact-button))))
 
 (defn- form-field
-  ([field-name & [place-holder]]
-   (let [titled (kebab-to-title (name field-name))
-         place-holder' (or place-holder (str "insert '" titled "' here."))]
-     [:p [:label {:for field-name} titled]
-         [:input {:name field-name :id field-name :type field-name :placeholder place-holder'}]
+  ([field-name & [initial-value]]
+   (let [titled-field-name (kebab-to-title (name field-name))
+         place-holder (str "insert '" titled-field-name "' here.")]
+     [:p [:label {:for field-name} titled-field-name]
+         [:input {:name field-name :id field-name :type field-name :placeholder (or initial-value place-holder) :value (str initial-value)}]
          [:span]])))
 
 (defn- contact-form-fields
   [contact]
-   (map #(form-field % ((keyword %) contact)) [:first-name :last-name :email :phone-number]))
+  ;; (map (fn [p] (form-field (first p) (second p))) contact))
+  (map #(form-field % ((keyword %) contact)) [:first-name :last-name :email :phone-number]))
 
 (defn- contact-form
   [post-path & [contact]]
@@ -56,9 +57,13 @@
 (defn- back-anchor []
   [:a {:href "/contacts"} "Back"])
 
-(defn new-contact-view []
-  (str (html (contact-form "/contacts/new")
-             (back-anchor))))
+(defn new-contact-view
+  ;; ([]
+  ;;  (str (html (contact-form "/contacts/new")
+  ;;             (back-anchor))))
+  ([& invalid-contact]
+   (str (html (contact-form "/contacts/new" (:valid-inputs invalid-contact))
+              (back-anchor)))))
 
 (defn- delete-contact-form
   [id]

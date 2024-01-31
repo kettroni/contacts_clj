@@ -1,6 +1,6 @@
 (ns server
   (:require
-   [validation             :refer [valid-contact]]
+   [validation             :refer [validate-contact]]
    [db                     :refer [create-contact
                                    delete-contact
                                    get-contact
@@ -35,16 +35,15 @@
 
 (defn create-new-contact [request]
   (let [fps (:form-params request)
-        c (valid-contact fps)]
-    ;; TODO: fix this to check for invalid type.
-    (if c
+        c (validate-contact fps)]
+    (if (empty? (:errors c))
       (let [base-response (redirect "/contacts" 303)
             response (response-with-flash-message base-response "Created a new contact!")]
-        (create-contact c)
+        (create-contact (:valid-inputs c))
         (flash-response response request))
-      {:status 400
-       :headers {"Content-Type" "text/plaintext; charset=UTF-8"}
-       :body (str "Invalid contact information: " fps)})))
+      {:status  200
+       :headers {"Content-Type" "text/html; charset=UTF-8"}
+       :body    (new-contact-view c)})))
 
 (defn- id-from-request-path [request]
   (let [path-params (:path-params request)]
@@ -59,7 +58,7 @@
 
 (defn- contact-edit [request]
   (let [fps (:form-params request)
-        c (valid-contact fps)]
+        c (validate-contact fps)]
     (if fps
       ;; TODO: implement saving and validation.
       ;; form-params available, handle post request.
